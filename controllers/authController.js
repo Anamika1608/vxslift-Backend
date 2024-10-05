@@ -4,7 +4,6 @@ import axios from 'axios';
 import cookie from 'cookie';
 
 import User from '../models/user.js';
-// import oauth2client from '../config/auth.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -58,13 +57,18 @@ export const register = async (req, res) => {
     const newUser = new User({ name, email, password });
     await newUser.save();
 
-    const token = jwt.sign({ id: newUser._id.toString() }, JWT_SECRET, { expiresIn: "12h" });
+    const token = jwt.sign({ id: newUser._id.toString() }, JWT_SECRET, { expiresIn: "48h" });
 
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 12 * 60 * 60 * 1000
+      });
+
     res.status(201).json({ message: "User registered successfully" });
 
   } catch (err) {
-
     res.status(500).json({ message: "Internal server error", error: err.message });
   }
 
