@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     default : null
   }
+  // perchased plan name
 });
 
 // Middleware to hash the password before saving

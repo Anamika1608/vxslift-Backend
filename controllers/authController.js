@@ -1,7 +1,5 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import axios from 'axios';
-import cookie from 'cookie';
 
 import User from '../models/user.js';
 
