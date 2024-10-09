@@ -1,19 +1,23 @@
 import mongoose from "mongoose";
 
 const paymentSchema = new mongoose.Schema({
-  razorpay_order_id: {
+  order_id: {
     type: String,
     required: true,
   },
-  razorpay_payment_id: {
+  payment_id: {
     type: String,
     required: true,
   },
-  razorpay_signature: {
+  signature: {
     type: String,
     required: true,
   },
-  // user id that made this payment
+  purchased_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
 });
 
 const Payment = mongoose.model("Payment", paymentSchema);

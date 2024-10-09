@@ -5,10 +5,7 @@ import cors from "cors";
  
 import authRoutes from "../routes/authRoute.js";
 import paymentRoutes from "../routes/paymentRoute.js"
-import Razorpay from 'razorpay';
-
-export const instance = new Razorpay({ key_id: process.env.RAZORPAY_API_KEY, key_secret: process.env.RAZORPAY_SECRET });
-
+import userRoutes from '../routes/userRoute.js'
 const port = process.env.PORT;
 
 async function main() {
@@ -28,6 +25,7 @@ app.use(cors({
 
 app.use(authRoutes);
 app.use(paymentRoutes);
+app.use(userRoutes);
 
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
