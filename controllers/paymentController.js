@@ -1,7 +1,7 @@
 import razorpayInstance from "../config/razorpay.js";
 import crypto from 'crypto'
 import Payment from "../models/payment.js";
-
+import User from "../models/user.js";
 const RazorpayInstance = razorpayInstance()
 
 export const createOrder = async (req, res) => {
@@ -35,7 +35,8 @@ export const verifyPayment = async (req, res) => {
     console.log('Verify payment API called');
 
     try {
-        const { order_id, payment_id, signature, user_ID } = req.body;
+        console.log(req.body)
+        const { order_id, payment_id, signature, user_ID, packageName } = req.body;
         const secret = process.env.RAZORPAY_SECRET;
 
         if (!secret) {
@@ -47,9 +48,19 @@ export const verifyPayment = async (req, res) => {
         const generatedSignature = hmac.digest("hex");
 
         if (generatedSignature === signature) {
-            // const newPayment = new Payment({ order_id, payment_id, signature, purchased_by: user_ID })
+            try {
+                const newPayment = new Payment({ order_id, payment_id, signature, purchased_by: user_ID })
 
-            // await newPayment.save() // saving to db
+                await newPayment.save();
+
+                console.log("payment details saved successfully");
+                console.log("user purchased plan - ", packageName)
+
+
+            } catch (error) {
+                console.log(error)
+                console.log("error in saving payment details")
+            }
 
             return res.status(200).json({
                 success: true,

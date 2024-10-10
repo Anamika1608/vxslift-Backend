@@ -1,4 +1,4 @@
-import User from "../models/user";
+import User from "../models/user.js";
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -43,5 +43,24 @@ export const getUser = async (req, res) => {
   catch (error) {
     console.error('Error in getUser:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const findByEmail = async (req, res) => {
+  console.log(req.query)
+  const { mail } = req.query;
+
+  try {
+    const user = await User.findOne({ email: mail });
+
+    if (!user) {
+      console.log('User not found for email:', mail);
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.status(200).json({ userId: user._id });
+  } catch (error) {
+    console.error('Error finding user by email:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
