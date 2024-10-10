@@ -25,12 +25,7 @@ export const login = async (req, res) => {
 
     const token = jwt.sign({ id: user._id.toString() }, JWT_SECRET, { expiresIn: "12h" });
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 12 * 60 * 60 * 1000
-    });
+    res.cookie('token', token);
 
     console.log('Cookie set:', res.getHeader('Set-Cookie'));
 
@@ -57,12 +52,7 @@ export const register = async (req, res) => {
 
     const token = jwt.sign({ id: newUser._id.toString() }, JWT_SECRET, { expiresIn: "48h" });
 
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 12 * 60 * 60 * 1000
-      });
+    res.cookie('token', token);
 
     res.status(201).json({ message: "User registered successfully" });
 
@@ -73,9 +63,11 @@ export const register = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie('token', { path: '/', domain: 'localhost' });
+  res.cookie("token","")
   res.json({ message: "logged-out" });
 };
+
 
 export const googleLogin = async (req, res) => {
   try {

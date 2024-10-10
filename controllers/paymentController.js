@@ -54,8 +54,18 @@ export const verifyPayment = async (req, res) => {
                 await newPayment.save();
 
                 console.log("payment details saved successfully");
-                console.log("user purchased plan - ", packageName)
 
+                const updatedUser = await User.findByIdAndUpdate(
+                    user_ID,
+                    { purchased_plan_name: packageName }, 
+                    { new: true } 
+                );
+
+                if (!updatedUser) {
+                    return console.log('User not found');
+                }
+
+                console.log('Updated User:', updatedUser);
 
             } catch (error) {
                 console.log(error)
