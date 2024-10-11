@@ -6,6 +6,7 @@ import cors from "cors";
 import authRoutes from "../routes/authRoute.js";
 import paymentRoutes from "../routes/paymentRoute.js"
 import userRoutes from '../routes/userRoute.js'
+import planRoutes from '../routes/planRoutes.js'
 const port = process.env.PORT;
 
 async function main() {
@@ -26,7 +27,7 @@ app.use(cors({
 app.use(authRoutes);
 app.use(paymentRoutes);
 app.use(userRoutes);
-
+app.use(planRoutes)
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
 });
