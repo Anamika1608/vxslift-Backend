@@ -63,11 +63,29 @@ export const register = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie('token', { path: '/', domain: 'localhost' });
-  res.cookie("token","")
+
+  res.clearCookie('token', {
+    path: '/',
+    domain: 'localhost',
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+
+  });
+
+
+  
+  res.cookie('token', '', {
+    expires: new Date(0),
+    path: '/',
+    domain: 'localhost',
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+
+  });
+
+  // Send the response
   res.json({ message: "logged-out" });
 };
-
 
 export const googleLogin = async (req, res) => {
   try {

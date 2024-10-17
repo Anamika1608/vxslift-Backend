@@ -17,9 +17,10 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     default: null
   },
-  purchased_plan_name: {
-    type: String
-  }
+  purchased_plan: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Plan'
+  }]
 });
 
 // Middleware to hash the password before saving
