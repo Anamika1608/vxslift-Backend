@@ -38,7 +38,7 @@ export const getUser = async (req, res) => {
 
     console.log('User found:', user);
 
-    res.status(200).json({ name: user.name, email: user.email, id: user._id });
+    res.status(200).json({ name: user.name, email: user.email, id: user._id , status : user.status});
   }
   catch (error) {
     console.error('Error in getUser:', error);
@@ -58,9 +58,57 @@ export const findByEmail = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    return res.status(200).json({ userId: user._id });
+    return res.status(200).json({ userId: user._id  , status : user.status});
   } catch (error) {
     console.error('Error finding user by email:', error);
     return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+export const updateStatus = async (req, res) => {
+  try {
+    const { planId, userId, status } = req.body;
+    if (!userId) return res.status(401).json({ message: "User ID not provided" });
+    if (!status) return res.status(400).json({ message: "Status not provided" });
+
+    const user = await User.findOneAndUpdate(
+      { _id: userId, "purchased_plans.plan": planId },
+      { $set: { "purchased_plans.$.status": status } }, 
+      { new: true } 
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User or Plan not found" });
+    }
+
+    return res.status(200).json({ message: "Status updated successfully", user });
+  } catch (error) {
+    console.log("Error in saving status", error);
+    return res.status(500).json({ message: "Error in saving the status" });
+  }
+};
+
+
+export const getStatus = async (req, res) => {
+  try {
+    const { planId, userId } = req.body;
+    if (!userId) return res.status(401).json({ message: "User ID not provided" });
+
+    const user = await User.findOne(
+      { _id: userId, "purchased_plans.plan": planId },
+      { "purchased_plans.$": 1 } 
+    );
+
+    if (!user || !user.purchased_plans.length) {
+      return res.status(404).json({ message: "User or Plan not found" });
+    }
+
+    const status = user.purchased_plans[0].status;
+
+    return res.status(200).json({ message: "Status fetched successfully", status });
+  } catch (error) {
+    console.log("Error in fetching status", error);
+    return res.status(500).json({ message: "Error in fetching the status" });
   }
 };

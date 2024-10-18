@@ -36,6 +36,7 @@ export const verifyPayment = async (req, res) => {
     console.log('Verify payment API called');
 
     try {
+        console.log(req.body)
         const { order_id, payment_id, signature, user_ID, packageName } = req.body;
         const secret = process.env.RAZORPAY_SECRET;
 
@@ -48,57 +49,36 @@ export const verifyPayment = async (req, res) => {
         const generatedSignature = hmac.digest("hex");
 
         if (generatedSignature === signature) {
-            const session = await mongoose.startSession();  // Start a session for transaction
-            session.startTransaction();  // Initiate transaction
             try {
-                // Save payment details
-                const newPayment = new Payment({
-                    order_id, 
-                    payment_id, 
-                    signature, 
-                    purchased_by: user_ID 
-                });
+                const newPayment = new Payment({ order_id, payment_id, signature, purchased_by: user_ID })
 
-                await newPayment.save({ session });
+                await newPayment.save();
 
-                console.log("Payment details saved successfully");
-
-                const purchasedPlan = await Plan.findOne({ name: packageName }).session(session);
-                if (!purchasedPlan) {
-                    throw new Error("Plan not found");
-                }
-
-                // Update user's purchased plans
+                console.log("payment details saved successfully");
+                const purchasedPlan = await Plan.findOne({ name: packageName });
+                console.log(purchasedPlan);
+                
                 const updatedUser = await User.findByIdAndUpdate(
                     user_ID,
-                    { $push: { purchased_plan: purchasedPlan._id } },
-                    { new: true, session }
+                    { $push: { purchased_plans: { plan: purchasedPlan._id } } },
+                    { new: true }
                 );
 
                 if (!updatedUser) {
-                    throw new Error('User not found');
+                    return console.log('User not found');
                 }
 
                 console.log('Updated User:', updatedUser);
 
-                await session.commitTransaction();  // Commit transaction
-                session.endSession();
-
-                return res.status(200).json({
-                    success: true,
-                    message: "Payment verified and details saved successfully"
-                });
             } catch (error) {
-                await session.abortTransaction();  // Rollback transaction
-                session.endSession();
-                console.error("Error saving payment or updating user:", error);
-
-                return res.status(500).json({
-                    success: false,
-                    message: "Error saving payment details or updating user. Please try again.",
-                    error: error.message
-                });
+                console.log(error)
+                console.log("error in saving payment details")
             }
+
+            return res.status(200).json({
+                success: true,
+                message: "Payment verified successfully"
+            });
         } else {
             return res.status(400).json({
                 success: false,
@@ -114,4 +94,3 @@ export const verifyPayment = async (req, res) => {
         });
     }
 };
-

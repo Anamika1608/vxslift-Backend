@@ -17,9 +17,16 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     default: null
   },
-  purchased_plan: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Plan'
+  purchased_plans: [{
+    plan: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Plan',
+      required: true
+    },
+    status: {
+      type: String,
+      default: ''  // Example statuses: 'pending', 'form_filled', 'appointment_scheduled'
+    }
   }]
 });
 
