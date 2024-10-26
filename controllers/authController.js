@@ -27,7 +27,6 @@ export const login = async (req, res) => {
 
     res.cookie('token', token);
 
-    console.log('Cookie set:', res.getHeader('Set-Cookie'));
 
     res.status(200).json({ message: "Logged in successfully", user: { name: user.name, email: user.email } });
   } catch (error) {
@@ -38,14 +37,14 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
-  console.log(req.body);
+
 
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-    console.log("inside try catch");
+
 
     const newUser = new User({ name, email, password });
     await newUser.save();

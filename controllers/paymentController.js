@@ -6,14 +6,12 @@ import Plan from "../models/plan.js";
 const RazorpayInstance = razorpayInstance()
 
 export const createOrder = async (req, res) => {
-    console.log(req.body)
     const { courseId, price } = req.body;
     const options = {
         amount: price * 100,
         receipt: `receipt_order_1`,
         currency: "INR"
     };
-    console.log(options)
     try {
         RazorpayInstance.orders.create(options, (err, order) => {
             if (err) {
@@ -33,10 +31,7 @@ export const createOrder = async (req, res) => {
 }
 
 export const verifyPayment = async (req, res) => {
-    console.log('Verify payment API called');
-
     try {
-        console.log(req.body)
         const { order_id, payment_id, signature, user_ID, packageName } = req.body;
         const secret = process.env.RAZORPAY_SECRET;
 
@@ -53,10 +48,7 @@ export const verifyPayment = async (req, res) => {
                 const newPayment = new Payment({ order_id, payment_id, signature, purchased_by: user_ID })
 
                 await newPayment.save();
-
-                console.log("payment details saved successfully");
                 const purchasedPlan = await Plan.findOne({ name: packageName });
-                console.log(purchasedPlan);
                 
                 const updatedUser = await User.findByIdAndUpdate(
                     user_ID,
@@ -68,7 +60,6 @@ export const verifyPayment = async (req, res) => {
                     return console.log('User not found');
                 }
 
-                console.log('Updated User:', updatedUser);
 
             } catch (error) {
                 console.log(error)
